@@ -1,0 +1,53 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-tables
+      author: pk
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: name
+                  type: varchar
+              - column:
+                  name: age
+                  type: int
+              - column:
+                  name: password
+                  type: varchar
+        - createTable:
+            tableName: houses
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: address
+                  type: varchar
+              - column:
+                  name: owner
+                  type: bigint
+                  constraints:
+                    references: users(id)
+        - createTable:
+            tableName: users_houses
+            columns:
+              - column:
+                  name: house_id
+                  type: bigint
+                  constraints:
+                    references: houses(id)
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    references: users(id)
