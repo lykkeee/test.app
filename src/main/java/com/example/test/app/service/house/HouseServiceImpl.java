@@ -7,7 +7,7 @@ import com.example.test.app.model.house.House;
 import com.example.test.app.model.house.HouseRequestDto;
 import com.example.test.app.model.house.HouseResponseDto;
 import com.example.test.app.model.house.HouseUpdateDto;
-import com.example.test.app.model.user.User;
+import com.example.test.app.model.user.ApplicationUser;
 import com.example.test.app.repository.HouseRepository;
 import com.example.test.app.repository.UserRepository;
 import lombok.AllArgsConstructor;
@@ -31,23 +31,23 @@ public class HouseServiceImpl implements HouseService {
 
     @Override
     public HouseResponseDto updateHouse(HouseUpdateDto houseUpdateDto, Long houseId) {
-        User user = null;
+        ApplicationUser applicationUser = null;
         if (houseUpdateDto.getOwner() != null) {
-            user = getUserExists(houseUpdateDto.getOwner());  //Если хотим изменить владельца, то проверяем существует ли такой пользователь
+            applicationUser = getUserExists(houseUpdateDto.getOwner());  //Если хотим изменить владельца, то проверяем существует ли такой пользователь
         }
-        House house = HouseMapper.toModel(houseUpdateDto, getHouseExists(houseId), user);
+        House house = HouseMapper.toModel(houseUpdateDto, getHouseExists(houseId), applicationUser);
         return HouseMapper.toResponse(houseRepository.save(house));
     }
 
     @Override
     public HouseResponseDto addUserToHouse(Long houseId, Long ownerId, Long userId) {
-        User user = getUserExists(userId);
+        ApplicationUser applicationUser = getUserExists(userId);
         getUserExists(ownerId);
         House house = getHouseExists(houseId); //Здесь опустил проверку на то, чтобы нельзя было добавить пользователя, если он является владельцем
         if (!house.getOwner().getId().equals(ownerId)) {  //проверяем владельца
             throw  new ConflictException("User with id=" + ownerId + " is not houses owner");
         }
-        house.getUsers().add(user);
+        house.getApplicationUsers().add(applicationUser);
         return HouseMapper.toResponse(houseRepository.save(house));
     }
 
@@ -68,7 +68,7 @@ public class HouseServiceImpl implements HouseService {
         houseRepository.deleteById(houseId);
     }
 
-    private User getUserExists(Long userId) {
+    private ApplicationUser getUserExists(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new DataNotFoundException("User with id=" + userId + " was not found"));
     }

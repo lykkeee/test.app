@@ -1,19 +1,12 @@
 package com.example.test.app.controller;
 
-import com.example.test.app.model.auth.AuthResponseDto;
-import com.example.test.app.model.auth.LoginDto;
+import com.example.test.app.model.auth.LoginRequestDto;
+import com.example.test.app.model.auth.LoginResponseDto;
 import com.example.test.app.model.auth.RegisterDto;
-import com.example.test.app.model.user.User;
-import com.example.test.app.repository.UserRepository;
-import com.example.test.app.utils.JwtGenerator;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import com.example.test.app.model.user.UserResponseDto;
+import com.example.test.app.service.AuthenticationService;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,43 +14,25 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/auth")
+@Slf4j
+@AllArgsConstructor
 public class AuthController {
-
-    private final AuthenticationManager authenticationManager;
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final JwtGenerator jwtGenerator;
-
-    @Autowired
-    public AuthController(AuthenticationManager authenticationManager, UserRepository userRepository, PasswordEncoder passwordEncoder, JwtGenerator jwtGenerator) {
-        this.authenticationManager = authenticationManager;
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.jwtGenerator = jwtGenerator;
-    }
+    private AuthenticationService authenticationService;
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody RegisterDto registerDto) {
-        if (userRepository.existsByName(registerDto.getName())) {
-            return new ResponseEntity<>("Name is taken", HttpStatus.BAD_REQUEST);
-        }
-
-        User user = new User();
-        user.setName(registerDto.getName());
-        user.setPassword(passwordEncoder.encode(registerDto.getPassword()));
-        user.setAge(registerDto.getAge());
-
-        userRepository.save(user);
-
-        return new ResponseEntity<>("User registered success", HttpStatus.CREATED);
+    public UserResponseDto register(@RequestBody RegisterDto registerDto) {
+        log.info("Запрос на регистрацию пользователя: {}", registerDto);
+        UserResponseDto userResponseDto = authenticationService.registerUser(registerDto);
+        log.info("Пользователь зарегистрирован: {}", userResponseDto);
+        return userResponseDto;
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponseDto> login(@RequestBody LoginDto loginDto) {
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDto.getName(), loginDto.getPassword()));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String token = jwtGenerator.generateToken(authentication);
-        return new ResponseEntity<>(new AuthResponseDto(token), HttpStatus.OK);
+    public LoginResponseDto login(@RequestBody LoginRequestDto loginRequestDto) {
+        log.info("Запрос на авторизацию пользователя: {}", loginRequestDto.getUsername());
+        LoginResponseDto loginResponseDto = authenticationService.loginUser(loginRequestDto);
+        log.info("Авторизация выполнена: {}", loginResponseDto);
+        return loginResponseDto;
     }
 
 }

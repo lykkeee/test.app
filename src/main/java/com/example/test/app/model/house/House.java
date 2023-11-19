@@ -1,6 +1,6 @@
 package com.example.test.app.model.house;
 
-import com.example.test.app.model.user.User;
+import com.example.test.app.model.user.ApplicationUser;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,9 +18,9 @@ public class House {
     private String address;
     @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "owner", referencedColumnName = "id") //Подразумеваю, что один пользователь может быть владельцем нескольких домов
-    private User owner;
+    private ApplicationUser owner;
     @ManyToMany(cascade = CascadeType.MERGE)
     @JoinTable(name = "users_houses", joinColumns = @JoinColumn(name = "house_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
-    private Set<User> users;
+    private Set<ApplicationUser> applicationUsers;
 }
