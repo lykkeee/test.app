@@ -1,0 +1,32 @@
+databaseChangeLog:
+  - changeSet:
+      id: drop-tables-if-exists
+      author: pk
+      preConditions:
+        - onFail: MARK_RAN
+        - tableExists:
+            tableName: roles
+        - tableExists:
+            tableName: users
+        - tableExists:
+            tableName: user_role_junction
+        - tableExists:
+            tableName: houses
+        - tableExists:
+            tableName: users_houses
+      changes:
+        - dropTable:
+            cascadeConstraints: true
+            tableName: roles
+        - dropTable:
+            cascadeConstraints: true
+            tableName: users
+        - dropTable:
+            cascadeConstraints: true
+            tableName: user_role_junction
+        - dropTable:
+            cascadeConstraints: true
+            tableName: houses
+        - dropTable:
+            cascadeConstraints: true
+            tableName: users_houses

@@ -64,7 +64,7 @@ public class HouseController {
         return houses;
     }
 
-    @PatchMapping("/{houseId}")
+    @DeleteMapping("/{houseId}")
     public void deleteHouse(@PathVariable Long houseId) {
         log.info("Запрос на удаление дома с id: {}", houseId);
         houseService.deleteHouse(houseId);

@@ -4,6 +4,19 @@ databaseChangeLog:
       author: pk
       changes:
         - createTable:
+            tableName: roles
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_role
+              - column:
+                  name: authority
+                  type: varchar
+        - createTable:
             tableName: users
             columns:
               - column:
@@ -12,15 +25,33 @@ databaseChangeLog:
                   autoIncrement: true
                   constraints:
                     primaryKey: true
+                    primaryKeyName: pk_user
               - column:
-                  name: name
+                  name: username
                   type: varchar
+                  constraints:
+                    unique: true
               - column:
                   name: age
                   type: int
               - column:
                   name: password
                   type: varchar
+        - createTable:
+            tableName: user_role_junction
+            columns:
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    references: users(id)
+                    foreignKeyName: fk_user_role_1
+              - column:
+                  name: role_id
+                  type: bigint
+                  constraints:
+                    references: roles(id)
+                    foreignKeyName: fk_user_role_2
         - createTable:
             tableName: houses
             columns:
@@ -30,6 +61,7 @@ databaseChangeLog:
                   autoIncrement: true
                   constraints:
                     primaryKey: true
+                    primaryKeyName: pk_house
               - column:
                   name: address
                   type: varchar
@@ -38,6 +70,7 @@ databaseChangeLog:
                   type: bigint
                   constraints:
                     references: users(id)
+                    foreignKeyName: fk_house_1
         - createTable:
             tableName: users_houses
             columns:
@@ -46,8 +79,10 @@ databaseChangeLog:
                   type: bigint
                   constraints:
                     references: houses(id)
+                    foreignKeyName: fk_user_house_1
               - column:
                   name: user_id
                   type: bigint
                   constraints:
                     references: users(id)
+                    foreignKeyName: fk_user_house_2
